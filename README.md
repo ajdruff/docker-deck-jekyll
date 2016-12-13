@@ -1,6 +1,6 @@
 # docker-deck-jekyll
 
-A [Docker](https://www.docker.com/what-docker) Deck that provides a [Docker compose file](https://docs.docker.com/compose/compose-file/) to create a Jekyll container using the standard [Docker Jekyll image](https://hub.docker.com/_/jekyll/).
+A [Docker](https://www.docker.com/what-docker) Deck that provides a [Docker compose file](https://docs.docker.com/compose/compose-file/) to create a [Jekyll](https://jekyllrb.com/) container using the standard [Docker Jekyll image](https://hub.docker.com/_/jekyll/).
 
 
 ### Quick Start
@@ -9,21 +9,75 @@ A [Docker](https://www.docker.com/what-docker) Deck that provides a [Docker comp
     curl -L https://github.com/ajdruff/docker-deck-jekyll/archive/master.tar.gz | tar -zx
     mv docker-deck-jekyll* example.com
     cd example.com
-    mv .env-sample .env
+    cp docker/config.env-sample docker/config.env
 
-
-create the new jekyll site
-
-    jekyll new . --force
-
-
-
-
-Edit `.env` file and change the MySQL root and WordPress user passwords.
-
-Now create and run the container:
+Now start the container:
 
     docker-compose up
+
+In your browser, browse to the IP of your Container Host and you'll see the default Jekyll site.
+
+
+### Configuration
+
+Edit `docker/config.env` file with any desired changes. 
+
+    #jekyll
+    JEKYLL_PORT=80
+    JEKYLL_SOURCE=jekyll_source
+    JEKYLL_SITE=jekyll_site
+
+**JEKYLL_PORT**
+
+Set this to the port that you'd like to access your Jekyll site. 
+
+**JEKYLL_SOURCE**
+
+This is the location to where the container's Jekyll source directory `/srv/jekyll` points.
+
+This directory contains your site's source files. Source files are the editable files that make up your site, and will be processed by Jekyll into html and copied to the `/srv/jekyll/_site` directory to be served by the web server.
+
+**JEKYLL_SITE**
+
+This is the location to where the container's Jekyll build directory `/srv/jekyll/_site` points. 
+
+This directory contains your site's static files. These are the html and other Jekyll generated files that are served by the Jekyll web server and that you'll upload to your live site's web root.
+
+**About Volumes**
+
+By default, `docker-compose.yml` sets `JEKYLL_SOURCE` and `JEKYLL_SITE` to internal volumes called `jekyll_source` and `jekyll_site` respectively. 
+
+To find the location of these volumes, you can do:
+
+    docker inspect -f '{{ json .Mounts }}' CONTAINER_ID | python -m json.tool
+
+ or
+ 
+    docker inspect CONTAINER_ID | grep Source
+
+To get the CONTAINER_ID :
+
+    docker ps
+
+while the container is running.
+
+
+### FAQS
+
+#### How do I change the location of  `/srv/jekyll` and `/srv/jekyll/_site` so I can easily access them with my native editor or ftp client?
+
+**Using Native Linux**
+
+If you are using Linux natively as the Container Host (not via a Virtual Machine), you can access these locations by navigating your file system to their default internal volume locations (see 'About Volumes' section to find their location). Alternately, you can map them using the `JEKYLL_SOURCE` and `JEKYLL_SITE` settings , similarly to what's required when using Windows or Mac.
+
+**Using Windows or Mac with VirtualBox**
+
+If you are using Windows/Mac with VirtualBox , you can map the locations to a share on your VirtualBox Host, and change the `${JEKYLL_SOURCE}` and `${JEKYLL_SITE}` settings in `docker/config.env` to point to the mapped locations.
+
+For example, if you create a shared VirtualBox folder `dev` which is mounted on the VirtualBox Host at `/media/vmhost/dev`, you could configure your settings like this :
+
+    JEKYLL_SOURCE=/media/vmhost/dev/example.com/_jekyll/source
+    JEKYLL_SITE=/media/vmhost/dev/example.com/_jekyll/www
 
 
 
@@ -35,10 +89,10 @@ Docker Decks consist of a Docker compose file, an environmental variable file th
 
 *Docker Decks try to adhere to the following:*
 
-* most configuration is done using the .env file, avoiding unneccesarily editing the docker-compose.yml file
+* most configuration is done using an environmental file, avoiding unneccesarily editing the docker-compose.yml file
 * defaults to using persistent volumes
 * defaults to using standard ports for webserver and database services
-
+* should work 'out of the box' with little to no configuration
 
 
 ### Prerequisites
@@ -56,6 +110,27 @@ The following is installed locally
 * *Container Host* refers to the machine in which Docker and Docker Compose is installed. It can be your local machine or a Virtual Machine (e.g: VirtualBox Guest).
 * *Docker Container* refers to the instance of the Docker image that is running on the Container host 
 * *Docker Image* refers to the image pulled from a repository (such as the Docker Hub) or locally which defines the container.
+
+**Example #1**
+
+You are using a Windows 10 laptop with VirtualBox. We'll call your laptop 'Windows'.
+
+You install the docker engine & docker compose on a VirtualBox Linux Virtual Machine. We'll call the Virtual Machine 'Debian'
+You use a Docker Deck to install a jekyll container on 'debian'. We'll call the container 'jekyll'. 
+
+* VirtualBox Host=Windows
+* VirtualBox Guest=Debian
+* Container Host=Debian
+* Docker Container=jekyll
+
+**Example #2**
+
+You are using a Debian laptop (with name 'Debian') with docker engine and docker-compose installed. 
+
+You install a jekyll container with name 'Jekyll'
+
+* Docker Container=Jekyll
+* Container Host=Debian
 
 
 
