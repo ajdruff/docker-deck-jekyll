@@ -1,16 +1,13 @@
+version: '2.1'
 #http://github.com/ajdruff/docker-deck-jekyll
 #docker-compose up
-version: '2.1'
-
 
     
 services:
    jekyll:
      build: 
       context: ./docker/_build
-     image: jekyll/jekyll:pages_deck
-     env_file: 
-       - docker/config.env     
+     image: jekyll/jekyll:pages_deck 
      command: /usr/local/bin/deck-start.sh
      volumes:
        - ${JEKYLL_SOURCE:-jekyll_source}:/srv/jekyll
