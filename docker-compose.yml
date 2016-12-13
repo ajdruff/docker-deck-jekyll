@@ -6,7 +6,7 @@ version: '2.1'
 services:
    jekyll:
      build: 
-      context: ./docker/_build
+      context: docker/_build
      image: jekyll/jekyll:pages_deck 
      command: /usr/local/bin/deck-start.sh
      volumes:
