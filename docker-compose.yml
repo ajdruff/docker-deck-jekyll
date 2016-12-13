@@ -1,11 +1,6 @@
-version: '2.1'
+#http://github.com/ajdruff/docker-deck-jekyll
 #docker-compose up
-#docker exec -it dockerdeckjekyll_jekyll_1  /bin/bash
-#jekyll new . --force
-#jekyll build this builds the server for the first time.
-#docker-compose
-#this compose files creates errors 
-
+version: '2.1'
 
 
     
